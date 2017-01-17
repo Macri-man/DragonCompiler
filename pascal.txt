@@ -1,0 +1,90 @@
+/*
+    Context free grammar for a psuedo Pascal Language
+    grammar G = (Alphabet,Variable,Rules,StartSymbol)
+*/
+
+program ->
+      PROGRAM IDENT '('  indentifier_list ')' ':'
+      declarations
+      subprogram_declarations
+      compound_statement
+      '.'
+
+indentifier_list ->
+      ID | identifier_list ',' ID
+
+declarations ->
+      declarations VAR indetifier_list ':' type ';' | EMPTY
+
+type ->
+      standard_type | ARRAY '[' NUM '.' '.' NUM ']' OF standard_type
+
+standard_type ->
+      INTEGER
+      | REAL
+
+subprogram_declarations ->
+      subprogram_declarations subprogram_declaration ';'
+      | EMPTY
+
+subprogram_declaration ->
+      subprogram_head declarations subprogram_declarations compound_statement
+
+subprogram_head ->
+      FUNCTION ID arguments ':' standard_type ';'
+      | PROCEDURE ID arguments ';'
+
+arguments ->
+      '(' parameter_list ')'
+      | EMPTY
+
+parameter_list ->
+      identifier_list ':' type
+      | parameter_list ';' identifier_list ':' type
+
+
+
+
+
+
+/*
+    Regular Expressions for tokens (upper-case sequences)
+*/
+
+ID      -> LETTER ( LETTER | DIGIT )*
+LETTER  -> [a-zA-Z]
+DIGIT   -> [0-9]
+NUM     -> [0-9]+
+
+PROGRAM -> "program"
+VAR     -> "var"
+OF      -> "of"
+ARRAY   -> "array"
+INTEGER -> "integer"
+REAL    -> "real"
+
+--------------------------------------------------
+Example main.p
+
+program main( input );
+(* Declarations *)
+  var i,j: integer;
+  var x,y,z: real;
+(* subprogram declarations *)
+  function foo( x: integer) : real;
+    var y: integer;
+    function moo(x:integer):integer;
+    begin
+    end;
+  begin
+    y := 13.0
+    foo := foo(x)
+  end;
+
+  procedure boo( x: integer);
+  begin
+  end;
+
+begin
+ (* body *)
+end.
