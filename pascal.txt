@@ -11,13 +11,16 @@ program ->
       '.'
 
 indentifier_list ->
-      ID | identifier_list ',' ID
+      ID
+      | identifier_list ',' ID
 
 declarations ->
-      declarations VAR indetifier_list ':' type ';' | EMPTY
+      declarations VAR indetifier_list ':' type ';'
+      | EMPTY
 
 type ->
-      standard_type | ARRAY '[' NUM '.' '.' NUM ']' OF standard_type
+      standard_type
+      | ARRAY '[' INUM DOTDOT INUM ']' OF standard_type
 
 standard_type ->
       INTEGER
@@ -42,26 +45,96 @@ parameter_list ->
       identifier_list ':' type
       | parameter_list ';' identifier_list ':' type
 
+compound_statement ->
+      BEGIN option_statements END
 
+optional_statements ->
+      statement_list
+      | EMPTY
 
+statement_list ->
+      statement
+      | statements_list ';' statement
 
+statement ->
+      variable ASSIGNOP expression
+      | procedure_statement
+      | compound_statement
+      | IF expression THEN statement ELSE statement
+      | WHILE expression DO statement
 
+variable ->
+      ID
+      | ID '[' expression ']'
+
+procedure_statements ->
+      ID
+      | ID '(' expression_list ')'
+
+expression_list ->
+      expression
+      | expression_list ',' expression
+
+expression ->
+      simple_expression
+      | simple_expression RELOP simple_expression
+
+simple_expression ->
+      term
+      /* | sign term */
+      | ADDOP term
+      | simple_expression ADDOP term
+
+term ->
+      factor
+      | term MULOP factor
+
+factor ->
+      ID
+      | ID '(' expression_list ')'
+      | ID '[' expression ']'
+      | INUM
+      | RNUM
+      | '(' expression ')'
+      | NOT factor
+
+/*
+sign ->
+      '+' | '-'
+*/
 
 /*
     Regular Expressions for tokens (upper-case sequences)
 */
 
-ID      -> LETTER ( LETTER | DIGIT )*
-LETTER  -> [a-zA-Z]
-DIGIT   -> [0-9]
-NUM     -> [0-9]+
+ID        -> LETTER ( LETTER | DIGIT )*
+LETTER    -> [a-zA-Z]
+DIGIT     -> [0-9]
 
-PROGRAM -> "program"
-VAR     -> "var"
-OF      -> "of"
-ARRAY   -> "array"
-INTEGER -> "integer"
-REAL    -> "real"
+INUM      -> [0-9]+
+RNUM      -> [0-9]+"."[0-9]+
+
+PROGRAM   -> "program"
+VAR       -> "var"
+OF        -> "of"
+ARRAY     -> "array"
+INTEGER   -> "integer"
+REAL      -> "real"
+FUNCTION  -> "function"
+PROCEDURE -> "procedure"
+BEGIN     -> "begin"
+END       -> "end"
+ASSIGNOP  -> ":="
+IF        -> "if"
+THEN      -> "then"
+ELSE      -> "else"
+WHILE     -> "while"
+DO        -> "do"
+RELOP     -> "<" | ">" | "<=" | ">=" | "=" | "<>"
+ADDOP     -> "+" | "-" | "or"
+MULOP     -> "*" | "/" | "and"
+NOT       -> "not"
+DOTDOT    -> ".."
 
 --------------------------------------------------
 Example main.p
@@ -70,6 +143,7 @@ program main( input );
 (* Declarations *)
   var i,j: integer;
   var x,y,z: real;
+  var arr: array[ -13 .. 17 ]
 (* subprogram declarations *)
   function foo( x: integer) : real;
     var y: integer;
@@ -87,4 +161,9 @@ program main( input );
 
 begin
  (* body *)
+ x := 13
+ if (x + y * z < 13) then
+    x := 17
+ else
+    arr[0] := arr[1]
 end.

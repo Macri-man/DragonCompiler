@@ -1,0 +1,17 @@
+/* Calculator */
+
+/* ambiguous grammar */
+Grammar G = (Alphabet = {NUM,+,*,(,)}, Variables = {expr}, Rules, StartSymbol = expr)
+
+expr ->
+  expr '+' expr
+  | expr '*' expr
+  | '(' expr ')'
+  | NUM
+
+  INPUT: "2 + 3 * 4" (is this valid/legal in the language L(G)? YES)
+        Why valid? Because there is a derivation from start to the string (NUM, '+', NUM, '*', NUM)
+        NUM + NUM * NUM
+
+        expr => expr '+' expr => expr '+' expr '*' => NUM '+' NUM '*' NUM (accept)
+        expr => expr '*' expr => expr '+' expr '*' => NUM '+' NUM '*' NUM (accept)
